@@ -4,6 +4,8 @@
 
 ## Consigne: Extraire les données d’un site
 
+## See it live: [](www.mipam.ch)
+
 1. Aller sur imdb.com et extraire d’une fiche:
 • Le titre
 • L’année
