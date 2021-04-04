@@ -15,13 +15,4 @@
 recherche sur IMDB
 
 3. Permettre la sauvegarde des informations du film en local avec
-  classement et commentaire personnel
-
-
-![](\MOVIES\Capture.PNG)
-
-![](\MOVIES\Capture2.PNG)
-
-![](\MOVIES\Capture3.PNG)
-
-![](\MOVIES\Capture4.PNG)
+classement et commentaire personnel
