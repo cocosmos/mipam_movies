@@ -275,7 +275,8 @@
                             /**It will show every actors with their roles*/
                             if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
                                 for ($i=0, $count = count($name); $i<$count ;$i++){
-                                    echo '<tr><th scope="row">'.$i.'<td>'.$characters[1][$i].'</td><td>'. $name[$i].'</td></tr>';
+                                    $j=$i+1;
+                                    echo '<tr><th scope="row">'.$j.'<td>'.$characters[1][$i].'</td><td>'. $name[$i].'</td></tr>';
                                     
                                     /**ACTORS PART BDD**/
                                     
