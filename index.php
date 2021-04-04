@@ -134,10 +134,10 @@
                         <?php
                         if(!isset($_REQUEST["search"])&&!isset($_REQUEST["link"])){//My top 10 movies on the first page before the search
                             echo'<thead>';
-                            echo '<h2 class="text-center">My top 10 Movies and Series :</h2>'; 
+                            echo '<h2 class="text-center">My top 15 Movies and Series :</h2>'; 
                             echo '<tr><th scope="col">Note</th><th scope="col">Image</th><th scope="col">Title</th><th scope="col">Comment</th><th scope="col">Button</th></tr>';
                             echo'</thead><tbody>';
-                            for ($i=0; $i<10 ;$i++){//loop to select my top 10 movies
+                            for ($i=0; $i<15 ;$i++){//loop to select my top 10 movies
                             
                                 $result = $db->prepare(
                                     "SELECT link, note, title, image, comment FROM movie ORDER BY note DESC",
