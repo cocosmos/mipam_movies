@@ -11,8 +11,8 @@
     //Search Part you can search a full title like "the lords of the rings" it will works :)
     if(isset($_REQUEST["search"])){
         $search = $_REQUEST["search"];
-        $pattern='/(\s)/i';//Find space to replace with +
-        $source = file_get_contents("https://www.imdb.com/find?q=".preg_replace($pattern, '+', $search).'&s=tt&ttype=ft&ref_=fn_ft');
+        $pattern='/(\s)/i';//Find space to replace with +                                                       
+        $source = file_get_contents("https://www.imdb.com/find?q=".preg_replace($pattern, '+', $search).'&s=tt&ref_=fn_al_tt_mr');
         preg_match_all('/<tr class="findResult \w+"> <td class="primary_photo"> <a href="\/title\/(\w+)\//i', $source, $link);
         preg_match_all('/<img src="([^"]+)" \/><\/a> <\/td> <td class="result_text">/i', $source, $limg);
         preg_match_all('/<td class="result_text"> <a href="[^"]+" >([^<]+)/i', $source, $movie);
@@ -126,7 +126,7 @@
                     <form method="POST"> 
                         <div class="input-group mb-3">
                             <!--Search bar-->
-                            <input type="text" name="search" class="form-control mb-5" placeholder="Search movie...">
+                            <input type="text" name="search" class="form-control mb-5" placeholder="Search movies or series...">
                             <button class="btn btn-outline-light mb-5" type="submit">Search !</button>
                         </div>
                     </form>
@@ -134,7 +134,7 @@
                         <?php
                         if(!isset($_REQUEST["search"])&&!isset($_REQUEST["link"])){//My top 10 movies on the first page before the search
                             echo'<thead>';
-                            echo '<h2 class="text-center">My top 10 Movies :</h2>'; 
+                            echo '<h2 class="text-center">My top 10 Movies and Series :</h2>'; 
                             echo '<tr><th scope="col">Note</th><th scope="col">Image</th><th scope="col">Title</th><th scope="col">Comment</th><th scope="col">Button</th></tr>';
                             echo'</thead><tbody>';
                             for ($i=0; $i<10 ;$i++){//loop to select my top 10 movies
@@ -183,7 +183,7 @@
                 <div class="col-lg-4">
                     <?php 
                     //Image of the movie
-                    if(isset($_REQUEST["link"])){
+                    if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
                     echo '<img class=mt-5 src="'.$image.'" alt="" width=300px>'; 
                     echo '<a href="index.php" class="btn btn-outline-light m-5">Return to my top 10</a>';
                     
@@ -192,7 +192,7 @@
                 <div class="col-lg-7">
                 <?php
                 /**TITLE RATING DATE AND DESCRIPTION */
-                if(isset($_REQUEST["link"])){
+                if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
                     echo '<h1 class=mt-5>'.$title.'</h1>';
                     echo '<p>Rating of viewers : '.$rating.'/10 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
                     <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
@@ -222,7 +222,7 @@
                                     <option value="6">It can do better : 6</option>
                                     <option value="7">Good : 7</option>
                                     <option value="8">Very good : 8</option>
-                                    <option value="9">Excelent : 9</option>
+                                    <option value="9">Excellent : 9</option>
                                     <option value="10">Best movie of the universe : 10</option>
                                 </select>
                             </div>
@@ -257,7 +257,7 @@
             <div class="row">
                         <?php
                          /**FULL CAST**/
-                        if(isset($_REQUEST["link"])){
+                        if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
                             echo '<h2>Full Cast:</h2>';
                             }
                         ?>
@@ -265,7 +265,7 @@
                     <table class="table table-dark table-striped">
                         <thead>
                             <?php
-                            if(isset($_REQUEST["link"])){
+                            if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
                                 echo '<tr><th scope="col">#</th><th scope="col">Role</th><th scope="col">Actors</th></tr>'; 
                                 }
                             ?>
@@ -273,7 +273,7 @@
                         <tbody>
                             <?php
                             /**It will show every actors with their roles*/
-                            if(isset($_REQUEST["link"])){
+                            if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
                                 for ($i=0, $count = count($name); $i<$count ;$i++){
                                     echo '<tr><th scope="row">'.$i.'<td>'.$characters[1][$i].'</td><td>'. $name[$i].'</td></tr>';
                                     
