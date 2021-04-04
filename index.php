@@ -7,7 +7,6 @@
     'root', '',   
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
-    
     //Search Part you can search a full title like "the lords of the rings" it will works :)
     if(isset($_REQUEST["search"])){
         $search = $_REQUEST["search"];
@@ -19,7 +18,13 @@
     }
     //Movie part
     if(isset($_REQUEST["link"])){
-        $source = file_get_contents("https://www.imdb.com/title/".$_REQUEST["link"]."");
+        $_SESSION['link']=$_REQUEST['link'];
+    }
+
+
+    if(isset($_REQUEST["link"])||isset($_REQUEST["note"])){
+        //Keep in session for the comment 
+        $source = file_get_contents("https://www.imdb.com/title/".$_SESSION['link']."");
         //Title and image
         preg_match('/"url": "\/title\/.+\/",\n  "name": "(.+)",\n  "image": "(.+)",/i', $source, $match);
         
@@ -39,13 +44,12 @@
         $id = $actors[1];
         $name = $actors[2];
         
-        //Keep in session for the comment 
-        $_SESSION['link']=$_REQUEST['link'];
+        
         
         /**SAVE THE MOVIE TO THE BDD */
         // Check if the id of the movie is already in use
         $result = $db->prepare(
-            "SELECT * FROM movie WHERE link='".$_REQUEST['link']."'",
+            "SELECT * FROM movie WHERE link='".$_SESSION['link']."'",
             [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]
         ); 
         $result->execute();
@@ -57,7 +61,7 @@
             ':image' => $image,
             ':rating' => $rating,
             ':date' => $date,
-            ':link' => $_REQUEST['link'],
+            ':link' => $_SESSION['link'],
         ];
        
         if(!$row){
@@ -132,7 +136,7 @@
                     </form>
                     <table class="table table-dark table-striped align-middle">
                         <?php
-                        if(!isset($_REQUEST["search"])&&!isset($_REQUEST["link"])){//My top 10 movies on the first page before the search
+                        if(!isset($_REQUEST["search"])&&!isset($_REQUEST["link"])&&!isset($_REQUEST["note"])){//My top 10 movies on the first page before the search
                             echo'<thead>';
                             echo '<h2 class="text-center">My top 15 Movies and Series :</h2>'; 
                             echo '<tr><th scope="col">Note</th><th scope="col">Image</th><th scope="col">Title</th><th scope="col">Comment</th><th scope="col">Button</th></tr>';
@@ -155,22 +159,22 @@
                                     <button type="submit" value="Submit" class="btn btn-outline-light">See more</button></form></td></tr>
                                     </tbody>';
                                 }
-                            }
+                        }
 
-                            if(isset($_REQUEST["search"])){
-                                echo'<tbody><thead>';
-                                echo '<tr><th scope="col">Image</th><th scope="col">Title</th><th scope="col">Button</th></tr>'; 
-                                echo'</thead>';
+                        if(isset($_REQUEST["search"])){
+                            echo'<tbody><thead>';
+                            echo '<tr><th scope="col">Image</th><th scope="col">Title</th><th scope="col">Button</th></tr>'; 
+                            echo'</thead>';
+                        }
+                        /**List all the movie with the name research */
+                        if(isset($_REQUEST["search"])){
+                            for ($i=0, $count = count($movie[1]); $i<$count ;$i++){  
+                                echo'<td><img src="'.$limg[1][$i].'"width=70px></td>';
+                                echo'<td><h4>'.$movie[1][$i].'</h4></td>
+                                <td><form><input type="hidden" name="link" value="'.$link[1][$i].'">
+                                <button type="submit" value="Submit" class="btn btn-outline-light">See more</button></form></td></tr></tbody>';
                             }
-                            /**List all the movie with the name research */
-                            if(isset($_REQUEST["search"])){
-                                for ($i=0, $count = count($movie[1]); $i<$count ;$i++){  
-                                    echo'<td><img src="'.$limg[1][$i].'"width=70px></td>';
-                                    echo'<td><h4>'.$movie[1][$i].'</h4></td>
-                                    <td><form><input type="hidden" name="link" value="'.$link[1][$i].'">
-                                    <button type="submit" value="Submit" class="btn btn-outline-light">See more</button></form></td></tr></tbody>';
-                                }
-                            }
+                        }
                         ?> 
                     </table>
                 </div>
@@ -183,7 +187,7 @@
                 <div class="col-lg-4">
                     <?php 
                     //Image of the movie
-                    if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
+                    if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])||isset($_REQUEST["note"])){
                     echo '<img class=mt-5 src="'.$image.'" alt="" width=300px>'; 
                     echo '<a href="index.php" class="btn btn-outline-light m-5">Return to my top 10</a>';
                     
@@ -192,7 +196,7 @@
                 <div class="col-lg-7">
                 <?php
                 /**TITLE RATING DATE AND DESCRIPTION */
-                if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
+                if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])||isset($_REQUEST["note"])){
                     echo '<h1 class=mt-5>'.$title.'</h1>';
                     echo '<p>Rating of viewers : '.$rating.'/10 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
                     <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
@@ -202,7 +206,7 @@
                     
                     /**NOTE AND COMMENT BDD + FORM */
                     $result = $db->prepare(//Check if comment and note exist
-                        "SELECT * FROM movie WHERE link='".$_REQUEST["link"]."' AND note IS NULL AND comment IS NULL",
+                        "SELECT * FROM movie WHERE link='".$_SESSION['link']."' AND note IS NULL AND comment IS NULL",
                         [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]
                     ); 
                     $result->execute();
@@ -237,7 +241,7 @@
                         //If the comment and note exist it will show the comment and the note
                         
                         $result = $db->prepare(//Check if comment and note exist
-                            "SELECT comment, note FROM movie WHERE link='".$_REQUEST["link"]."'",
+                            "SELECT comment, note FROM movie WHERE link='".$_SESSION["link"]."'",
                             [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]
                         ); 
                         $result->execute();
@@ -257,7 +261,7 @@
             <div class="row">
                         <?php
                          /**FULL CAST**/
-                        if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
+                        if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])||isset($_REQUEST["note"])){
                             echo '<h2>Full Cast:</h2>';
                             }
                         ?>
@@ -265,7 +269,7 @@
                     <table class="table table-dark table-striped">
                         <thead>
                             <?php
-                            if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
+                            if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])||isset($_REQUEST["note"])){
                                 echo '<tr><th scope="col">#</th><th scope="col">Role</th><th scope="col">Actors</th></tr>'; 
                                 }
                             ?>
@@ -273,7 +277,7 @@
                         <tbody>
                             <?php
                             /**It will show every actors with their roles*/
-                            if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])){
+                            if(isset($_REQUEST["link"])&&!isset($_REQUEST["search"])||isset($_REQUEST["note"])){
                                 for ($i=0, $count = count($name); $i<$count ;$i++){
                                     $j=$i+1;
                                     echo '<tr><th scope="row">'.$j.'<td>'.$characters[1][$i].'</td><td>'. $name[$i].'</td></tr>';
@@ -303,7 +307,7 @@
                                     };
                                     
                                     /**ROLE PART BDD**/
-                                    $id_role=$_REQUEST['link'].$id[$i]; //Special id for the role combining id of actor and id of the movies so it will be unique
+                                    $id_role=$_SESSION['link'].$id[$i]; //Special id for the role combining id of actor and id of the movies so it will be unique
                                     $result2 = $db->prepare(//Check if the role exist
                                         "SELECT * FROM role WHERE id_role='".$id_role."'",
                                         [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]
@@ -313,7 +317,7 @@
                                     $row2 = $result2->fetch(PDO::FETCH_ASSOC);
                                    
                                     $data2 = [
-                                        ':link' => $_REQUEST['link'],
+                                        ':link' => $_SESSION['link'],
                                         ':role' => $characters[1][$i],
                                         ':id' => $id[$i],
                                         ':id_role' => $id_role,
